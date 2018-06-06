@@ -16,7 +16,7 @@ public class controller {
   public static void main(String[] args) {
     try {
       controller c = new controller();
-      //c.demo1();
+      c.demo1();
       //c.demo2();
       //c.demo3();
       //c.demo4();
@@ -29,7 +29,7 @@ public class controller {
   // Requrirement #1
   // ***************************************************************************
   private void demo1() throws SQLException {
-
+      System.out.println("R1: Rooms and Rates ***********");
     // Step 0: Load MySQL JDBC Driver
     // No longer required as of JDBC 2.0  / Java 6
     try {
@@ -133,5 +133,47 @@ public class controller {
   // ***************************************************************************
   // Requrirement #3
   // ***************************************************************************
+  // Allow the user to provide a new value or to indicate ”no change”
+  // for a given field. Update the reservation based on any
+  // new information provided. If the user requests different
+  // begin and/or end dates, make sure to check whether the new
+  // begin and end dates conflict with another reservation in the system.
+  private void demo3() throws SQLException {
+    // Get user input
+    System.out.println("R3: Reservation Change **********");
+    // Connect to the sql database
+    try {
+  	    Class.forName("com.mysql.jdbc.Driver");
+  	    System.out.println("MySQL JDBC Driver loaded");
+  	} catch (ClassNotFoundException ex) {
+  	    System.err.println("Unable to load JDBC Driver");
+  	    System.exit(-1);
+  	}
 
+    try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+    							   System.getenv("HP_JDBC_USER"),
+    							   System.getenv("HP_JDBC_PW"))) {
+      Scanner scanner = new Scanner(System.in);
+      System.out.println("Enter a reservation number");
+      String resnumber = scanner.nextLine();
+      System.out.println("Enter in a field to change\n" +
+              "Ex: first name, last name, begin date, end date, " +
+              "number of children, number of adults\n" +
+              "Or type in 'no change'");
+      String fieldchange = scanner.nextLine();
+      String[] fieldchangelist = fieldchange.split(" ");
+      System.out.println("Enter the updated value");
+      String newarg = scanner.nextLine();
+      // Update first name
+      // Update last name
+        // Check for conflict with given dates
+        // Update begin dates
+          // Retrieve old checkin date
+          // Check for schedule conflict
+        // Update end date
+          // Retrieve old checkout date
+    }
+    // Update number of children
+    // Update number of adults
+  }
 }
