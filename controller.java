@@ -11,14 +11,17 @@ import java.util.LinkedHashMap;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class controller {
   public static void main(String[] args) {
     try {
       controller c = new controller();
-      c.demo1();
+      //c.demo1();
       //c.demo2();
-      //c.demo3();
+      c.demo3();
       //c.demo4();
       //c.demo5();
     } catch (SQLException e) {
@@ -161,17 +164,93 @@ public class controller {
               "number of children, number of adults\n" +
               "Or type in 'no change'");
       String fieldchange = scanner.nextLine();
-      String[] fieldchangelist = fieldchange.split(" ");
+      //fieldchange = fieldchange.toLowerCase();
       System.out.println("Enter the updated value");
       String newarg = scanner.nextLine();
+
+      System.out.println("fieldchange:" + fieldchange);
+
       // Update first name
       // Update last name
+      if (fieldchange.equals("first name") || fieldchange.equals("last name")) {
+        // Create a prepared sql statement to change the last name
+        String updateSql = "";
+        if (fieldchange.equals("first name")) {
+          updateSql = "UPDATE lab7_reservations SET FirstName = ? WHERE CODE = ?";
+        }
+        else {
+          updateSql = "UPDATE lab7_reservations SET LastName = ? WHERE CODE = ?";
+        }
+        // Start transaction
+        conn.setAutoCommit(false);
+
+        try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
+          // Step 4: Send SQL statement to DBMS
+          pstmt.setString(1, newarg);
+          pstmt.setString(2, resnumber);
+  		    int rowCount = pstmt.executeUpdate();
+          // Step 5: Handle results
+  		    System.out.format("Updated %d records for %s %n", rowCount, newarg);
+          // Step 6: Commit or rollback transaction
+  		    conn.commit();
+  	    } catch (SQLException e) {
+  		      conn.rollback();
+  	    }
+      }
+      else if (fieldchange.equals("begin date") || fieldchange.equals("end date")) {
         // Check for conflict with given dates
-        // Update begin dates
-          // Retrieve old checkin date
-          // Check for schedule conflict
-        // Update end date
-          // Retrieve old checkout date
+        // Create a prepared sql statement
+        // TODO This statement needs work
+        // Must check if new begin date crosses into other reservation
+        // Must check if new end date crosses into other reservation
+        // Get information from current reservation
+        String reservation = "SELECT * FROM lab7_reservations WHERE CODE = ?";
+        String roomcode, room, checkin, checkout, rate;
+        String adults, kids, lastname, firstname;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date begin, out;
+        begin = out = "0000-00-00";
+        // Start transaction
+        conn.setAutoCommit(false);
+        try (PreparedStatement pstmt = conn.prepareStatement(reservation)) {
+          pstmt.setString(1, resnumber);
+          ResultSet rs = pstmt.executeQuery();
+          while (rs.next()) {
+            roomcode = rs.getString("CODE");
+            room = rs.getString("Room");
+            checkin = rs.getString("CheckIn");
+            checkout = rs.getString("Checkout");
+            rate = rs.getString("Rate");
+            lastname = rs.getString("LastName");
+            firstname = rs.getString("FirstName");
+            adults = rs.getString("Adults");
+            kids = rs.getString("Kids");
+          }
+          // Check for begin date and end date crossing
+          if (fieldchange.equals("begin date")) {
+            begin = sdf.parse(newarg);
+            out = sdf.parse(checkout);
+          } else {
+            begin = sdf.parse(checkin);
+            out = sdf.parse(newarg);
+          }
+          // Date crosses
+          if (begin.after(out) || out.before(begin)) {
+            System.out.print("Invalid date given!");
+            System.out.print("Checkin date cannot come after checkout date");
+          } else if (begin.equals(out)) {
+            System.out.print("Invalid date given!");
+            System.out.print("Checkin date cannot be the same as checkout date");
+          }
+
+        }
+      }
+
+      // Update begin dates
+        // Retrieve old checkin date
+        // Check for schedule conflict
+      // Update end date
+        // Retrieve old checkout date
     }
     // Update number of children
     // Update number of adults
