@@ -349,7 +349,7 @@ public class controller {
           ResultSet rs = pstmt.executeQuery();
           // Get current reservation
           if (!rs.next()) {
-            System.out.print("Invalid room code!\nTerminating program.");
+            System.out.println("Invalid room code!\nTerminating program.");
             return;
           } else {
             rs.beforeFirst();
