@@ -398,7 +398,7 @@ public class controller {
             pstmt2.setString(2, resnumber);
             int rowCount = pstmt2.executeUpdate();
             if (rowCount > 0) {
-              System.out.println("** Updating " + fieldchange + " **");
+              System.out.println("** Updated " + fieldchange + " to " + newarg + " **");
               conn.commit();
             } else {
               System.out.println("Failed to update reservation");
