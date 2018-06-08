@@ -272,7 +272,7 @@ public class controller {
               psmt2.setString(1, resnumber);
               psmt2.setString(2, newarg);
               psmt2.setString(3, room);
-      		    ResultSet rs2 = pstmt.executeQuery();
+      		    ResultSet rs2 = psmt2.executeQuery();
               // If the set is empty, no conflict
               if (!rs2.next()) {
                 // Update the reservation
