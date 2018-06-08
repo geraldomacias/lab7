@@ -297,7 +297,11 @@ public class controller {
                   // Step 4: Send SQL statement to DBMS
           		    int rowCount = stmt3.executeUpdate();
                   // Step 5: Handle results
-          		    System.out.println("Updated reservation:" + resnumber);
+                  if (rowCount > 0) {
+          		      System.out.println("Updated reservation:" + resnumber);
+                  } else {
+                    System.out.println("Error updating reservation");
+                  }
           	    } catch (SQLException e) {
           		      conn.rollback();
           	    }
