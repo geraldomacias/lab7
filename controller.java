@@ -416,4 +416,64 @@ public class controller {
   // ***************************************************************************
   // Requrirement #4
   // ***************************************************************************
+  /*
+  Reservation Cancellation.
+  Allow the user to cancel an existing reservation.
+  Accept from the user a reservation code, confirm the cancellation,
+  then remove the reservation record from the database.
+  */
+  private void demo4() throws SQLException {
+    String roomcode, room, checkin, checkout, rate;
+    String adults, kids, lastname, firstname;
+    String updateSql;
+    updateSql = roomcode = room = checkin = checkout = rate = adults = kids = lastname = firstname = "";
+
+    System.out.println("-- Reservation Cancellation --");
+    // Connect to the sql database
+    try {
+  	    Class.forName("com.mysql.jdbc.Driver");
+  	    System.out.println("MySQL JDBC Driver loaded");
+  	} catch (ClassNotFoundException ex) {
+  	    System.err.println("Unable to load JDBC Driver");
+  	    System.exit(-1);
+  	}
+    try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+    							   System.getenv("HP_JDBC_USER"),
+    							   System.getenv("HP_JDBC_PW"))) {
+      // Get user input
+      Scanner scanner = new Scanner(System.in);
+      System.out.println("Enter in the reservation code for the reservation you wish to cancel");
+      String resnumber = scanner.nextLine();
+      String sql = "SELECT * FROM lab7_reservations WHERE CODE = ?";
+      // Print the current reservation
+      try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, resnumber);
+        ResultSet rs = pstmt.executeQuery();
+        // Get current reservation
+        if (!rs.next()) {
+          System.out.println("Invalid room code!\nTerminating program.");
+          return;
+        } else {
+          rs.beforeFirst();
+        }
+        while (rs.next()) {
+          roomcode = rs.getString("CODE");
+          room = rs.getString("Room");
+          checkin = rs.getString("CheckIn");
+          checkout = rs.getString("Checkout");
+          rate = rs.getString("Rate");
+          lastname = rs.getString("LastName");
+          firstname = rs.getString("FirstName");
+          adults = rs.getString("Adults");
+          kids = rs.getString("Kids");
+        }
+        System.out.println("---- Current reservation ----");
+        System.out.println("Roomcode\tRoomName\tCheckin\tCheckout\tRate\tLastName\tFirstName\tAdults\tKids");
+        System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+        roomcode, room, checkin, checkout, rate, lastname, firstname, adults, kids);
+      } catch (SQLException e) {
+          conn.rollback();
+      }
+    } 
+  }
 }
