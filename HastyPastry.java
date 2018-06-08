@@ -93,7 +93,8 @@ public class HastyPastry {
 							   System.getenv("HP_JDBC_USER"),
 							   System.getenv("HP_JDBC_PW"))) {
 	    // Step 2: Construct SQL statement
-	    String sql = "SELECT * FROM hp_goods WHERE ";
+	    //String sql = "SELECT * FROM hp_goods";
+      String sql = "SELECT * FROM hp_goods WHERE Price = 5.55";
 
 	    // Step 3: (omitted in this example) Start transaction
 
