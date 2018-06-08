@@ -297,7 +297,7 @@ public class controller {
                   // Step 4: Send SQL statement to DBMS
           		    int rowCount = stmt3.executeUpdate();
                   // Step 5: Handle results
-          		    System.out.format("Updated reservation %d %n", resnumber);
+          		    System.out.println("Updated reservation:" + resnumber);
           	    } catch (SQLException e) {
           		      conn.rollback();
           	    }
