@@ -24,6 +24,7 @@ public class controller {
       //c.demo3();
       c.demo4();
       //c.demo5();
+      //c.demo6();
     } catch (SQLException e) {
   	    System.err.println("SQLException: " + e.getMessage());
     }
@@ -504,5 +505,35 @@ public class controller {
           conn.rollback();
       }
     }
+  }
+  // ***************************************************************************
+  // Requrirement #5
+  // ***************************************************************************
+
+  // ***************************************************************************
+  // Requrirement #6
+  // ***************************************************************************
+  private void demo6() throws SQLException {
+    /*
+    When this option is selected, your system shall provide a month-by-month
+    overview of revenue for an entire year. For the purpose of this assignment,
+    all revenue from the reservation is assigned to the month and year when the
+    reservation ended. For example a seven-day hotel stay that started
+    on October 30 will be treated as November revenue.
+    Your system shall display a list of rooms, and, for each room, 1
+    3 columns: 12 columns showing dollar revenue for each month and a
+    13th column to display total year revenue for the room.
+    There shall also be a ”totals” row in the table, which contains column
+    totals. All amounts should be rounded to the nearest whole dollar.
+    */
+    System.out.println("-- Revenue report --");
+    // Connect to the sql database
+    try {
+  	    Class.forName("com.mysql.jdbc.Driver");
+  	    System.out.println("MySQL JDBC Driver loaded");
+  	} catch (ClassNotFoundException ex) {
+  	    System.err.println("Unable to load JDBC Driver");
+  	    System.exit(-1);
+  	}
   }
 }
