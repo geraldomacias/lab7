@@ -160,9 +160,9 @@ public class controller {
       System.out.println("Enter a reservation number");
       String resnumber = scanner.nextLine();
       System.out.println("Enter in a field to change\n" +
-              "Ex: first name, last name, begin date, end date, " +
-              "number of children, number of adults\n" +
-              "Or type in 'no change'");
+              "--OPTIONS--\n-first name-\n-last name-\n-begin date-\n-end date-\n" +
+              "-number of children-\n-number of adults-\n" +
+              "-Or type in 'no change'-");
       String fieldchange = scanner.nextLine();
       //fieldchange = fieldchange.toLowerCase();
       System.out.println("Enter the updated value");
@@ -189,9 +189,16 @@ public class controller {
           pstmt.setString(2, resnumber);
   		    int rowCount = pstmt.executeUpdate();
           // Step 5: Handle results
+          if (rowCount > 0) {
   		    System.out.format("Updated %d records for %s %n", rowCount, newarg);
           // Step 6: Commit or rollback transaction
   		    conn.commit();
+        } else {
+          System.out.println("** No records were changed. **\n" +
+          "** Enter in a valid reservation cod. **");
+          conn.rollback();
+        }
+
   	    } catch (SQLException e) {
   		      conn.rollback();
   	    }
@@ -319,8 +326,38 @@ public class controller {
   		      conn.rollback();
   	    }
       }
+      else if (fieldchange.equals("number of children") || fieldchange.equals("number of adults")) {
+        // Update number of children
+        // Update number of adults
+        System.out.println("Updating " + fieldchange);
+        // Print current reservations
+        String reservation = "SELECT * FROM lab7_reservations WHERE CODE = ?";
+        String roomcode, room, checkin, checkout, rate;
+        String adults, kids, lastname, firstname;
+        roomcode = room = checkin = checkout = rate = adults = kids = lastname = firstname = "";
+        conn.setAutoCommit(false);
+        try (PreparedStatement pstmt = conn.prepareStatement(reservation)) {
+          pstmt.setString(1, resnumber);
+          ResultSet rs = pstmt.executeQuery();
+          // Get current reservation
+          while (rs.next()) {
+            roomcode = rs.getString("CODE");
+            room = rs.getString("Room");
+            checkin = rs.getString("CheckIn");
+            checkout = rs.getString("Checkout");
+            rate = rs.getString("Rate");
+            lastname = rs.getString("LastName");
+            firstname = rs.getString("FirstName");
+            adults = rs.getString("Adults");
+            kids = rs.getString("Kids");
+          }
+          System.out.println("---- Current reservation ----");
+          System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+          roomcode, room, checkin, checkout, rate, lastname, firstname, adults, kids);
+        } catch (SQLException e) {
+            conn.rollback();
+        }
+      }
     }
-    // Update number of children
-    // Update number of adults
   }
 }
