@@ -229,6 +229,9 @@ public class controller {
             adults = rs.getString("Adults");
             kids = rs.getString("Kids");
           }
+          System.out.println("Current reservation ----");
+          System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+          roomcode, room, checkin, checkout, rate, lastname, firstname, adults, kids);
           // Check for begin date and end date crossing
           if (fieldchange.equals("begin date")) {
             try {
