@@ -259,12 +259,14 @@ public class controller {
           else {
             // Check conflict with other reservations
             String sqlcheckdate = "SELECT * FROM lab7_reservations " +
-                    "WHERE CODE <> ? AND ? BETWEEN CheckIn AND Checkout";
+                    "WHERE CODE <> ? AND ? BETWEEN CheckIn AND Checkout" +
+                    "AND Room = ?";
             // Start transaction
             conn.setAutoCommit(false);
             try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
               pstmt.setString(1, resnumber);
               pstmt.setString(2, newarg);
+              pstmy.setString(3, room);
       		    ResultSet rs2 = pstmt.executeQuery();
               // If the set is empty, no conflict
               if (!rs2.next()) {
