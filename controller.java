@@ -282,11 +282,11 @@ public class controller {
                 String updateSql = "";
                 if (fieldchange.equals("begin date")) {
                   updateSql = "UPDATE lab7_reservations " +
-                              "SET CheckIn = '?' " +
+                              "SET CheckIn = ? " +
                               "WHERE CODE = ? ";
                 } else {
                   updateSql = "UPDATE lab7_reservations " +
-                              "SET Checkout = '?' " +
+                              "SET Checkout = ? " +
                               "WHERE CODE = ? ";
                 }
                 // Start transaction
