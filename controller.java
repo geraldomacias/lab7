@@ -267,8 +267,9 @@ public class controller {
                     "WHERE CODE <> ? AND '?' BETWEEN CheckIn AND Checkout" +
                     "AND Room = ?";
             // Start transaction
-            //conn.setAutoCommit(false);
+            conn.setAutoCommit(false);
             try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
+              System.out.println("PreparedStatement2");
               psmt2.setString(1, resnumber);
               psmt2.setString(2, newarg);
               psmt2.setString(3, room);
