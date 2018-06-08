@@ -271,7 +271,7 @@ public class controller {
             try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
               System.out.println("PreparedStatement2");
               psmt2.setString(1, resnumber);
-              psmt2.setString(2, newarg);
+              psmt2.setDate(2, java.sql.Date.valueOf(newarg));
               psmt2.setString(3, room);
       		    ResultSet rs2 = psmt2.executeQuery();
               // If the set is empty, no conflict
@@ -290,9 +290,11 @@ public class controller {
                 }
                 // Start transaction
                 conn.setAutoCommit(false);
-                try (Statement stmt3 = conn.createStatement()) {
+                try (PreparedStatement stmt3 = conn.prepareStatement(updateSql)) {
+                  stmt3.setDate(1, java.sql.Date.valueOf(newarg));
+                  stmt3.setString(2, resnumber);
                   // Step 4: Send SQL statement to DBMS
-          		    int rowCount = stmt3.executeUpdate(updateSql);
+          		    int rowCount = stmt3.executeUpdate();
                   // Step 5: Handle results
           		    System.out.format("Updated reservation %d %n", resnumber);
           	    } catch (SQLException e) {
