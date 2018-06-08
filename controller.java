@@ -198,7 +198,7 @@ public class controller {
   	    }
       }
       else if (fieldchange.equals("begin date") || fieldchange.equals("end date")) {
-        System.out.println("Date change ----");
+        System.out.println("Attmepting to change date");
         // Check for conflict with given dates
         // Create a prepared sql statement
         // TODO This statement needs work
@@ -229,7 +229,7 @@ public class controller {
             adults = rs.getString("Adults");
             kids = rs.getString("Kids");
           }
-          System.out.println("Current reservation ----");
+          System.out.println("---- Current reservation ----");
           System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
           roomcode, room, checkin, checkout, rate, lastname, firstname, adults, kids);
           // Check for begin date and end date crossing
@@ -275,6 +275,7 @@ public class controller {
               // If the set is empty, no conflict
               if (!rs2.next()) {
                 // Update the reservation
+                System.out.println("No conflicts with given date " + newarg);
                 String updateSql = "";
                 if (fieldchange.equals("begin date")) {
                   updateSql = "UPDATE lab7_reservations " +
