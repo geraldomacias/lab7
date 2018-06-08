@@ -475,7 +475,7 @@ public class controller {
         String answer = scanner.nextLine();
         if (answer.equals("y") || answer.equals("Y")) {
           // Remove the reservation
-          String deleteSql = "DELETE FROM lab7lab7_reservations WHERE CODE = ?";
+          String deleteSql = "DELETE FROM lab7_reservations WHERE CODE = ?";
           conn.setAutoCommit(false);
           try (PreparedStatement pstmt2 = conn.prepareStatement(deleteSql)) {
         		pstmt2.setString(1, resnumber);
