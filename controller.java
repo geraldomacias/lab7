@@ -266,7 +266,7 @@ public class controller {
             try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
               pstmt.setString(1, resnumber);
               pstmt.setString(2, newarg);
-              pstmy.setString(3, room);
+              pstmt.setString(3, room);
       		    ResultSet rs2 = pstmt.executeQuery();
               // If the set is empty, no conflict
               if (!rs2.next()) {
