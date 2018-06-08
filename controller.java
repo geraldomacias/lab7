@@ -209,12 +209,14 @@ public class controller {
         String adults, kids, lastname, firstname;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date begin, out;
-        begin = out = "0000-00-00";
+        begin = out = new Date();
+        roomcode = room = checkin = checkout = rate = adults = kids = lastname = firstname = "";
         // Start transaction
         conn.setAutoCommit(false);
         try (PreparedStatement pstmt = conn.prepareStatement(reservation)) {
           pstmt.setString(1, resnumber);
           ResultSet rs = pstmt.executeQuery();
+          // Get current reservation
           while (rs.next()) {
             roomcode = rs.getString("CODE");
             room = rs.getString("Room");
@@ -228,29 +230,77 @@ public class controller {
           }
           // Check for begin date and end date crossing
           if (fieldchange.equals("begin date")) {
-            begin = sdf.parse(newarg);
-            out = sdf.parse(checkout);
+            try {
+              begin = sdf.parse(newarg);
+              out = sdf.parse(checkout);
+            } catch (Exception e) {
+              System.out.println("Failed string parse");
+            }
+
           } else {
-            begin = sdf.parse(checkin);
-            out = sdf.parse(newarg);
+            try {
+              begin = sdf.parse(checkin);
+              out = sdf.parse(newarg);
+            } catch (Exception e) {
+              System.out.println("Failed string parse");
+            }
           }
           // Date crosses
           if (begin.after(out) || out.before(begin)) {
-            System.out.print("Invalid date given!");
-            System.out.print("Checkin date cannot come after checkout date");
-          } else if (begin.equals(out)) {
-            System.out.print("Invalid date given!");
-            System.out.print("Checkin date cannot be the same as checkout date");
+            System.out.println("Invalid date given!");
+            System.out.println("Checkin date cannot come after checkout date");
           }
-
-        }
+          // Date are equal
+          else if (begin.equals(out)) {
+            System.out.println("Invalid date given!");
+            System.out.println("Checkin date cannot be the same as checkout date");
+          }
+          // Dates do not cross eachother
+          else {
+            // Check conflict with other reservations
+            String sqlcheckdate = "SELECT * FROM lab7_reservations " +
+                    "WHERE CODE <> ? AND ? BETWEEN CheckIn AND Checkout";
+            // Start transaction
+            conn.setAutoCommit(false);
+            try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
+              pstmt.setString(1, resnumber);
+              pstmt.setString(2, newarg);
+      		    ResultSet rs2 = pstmt.executeQuery();
+              // If the set is empty, no conflict
+              if (!rs2.next()) {
+                // Update the reservation
+                String updateSql = "";
+                if (fieldchange.equals("begin date")) {
+                  updateSql = "UPDATE lab7_reservations " +
+                              "SET CheckIn = ? " +
+                              "WHERE CODE = ? ";
+                } else {
+                  updateSql = "UPDATE lab7_reservations " +
+                              "SET Checkout = ? " +
+                              "WHERE CODE = ? ";
+                }
+                // Start transaction
+                conn.setAutoCommit(false);
+                try (Statement stmt3 = conn.createStatement()) {
+                  // Step 4: Send SQL statement to DBMS
+          		    int rowCount = stmt3.executeUpdate(updateSql);
+                  // Step 5: Handle results
+          		    System.out.format("Updated reservation %d %n", resnumber);
+          	    } catch (SQLException e) {
+          		      conn.rollback();
+          	    }
+              } else {
+                System.out.println("The given date has a conflict with reservation:"
+                                  + rs.getString("CODE"));
+              }
+            } catch (SQLException e) {
+      		      conn.rollback();
+      	    }
+          }
+        } catch (SQLException e) {
+  		      conn.rollback();
+  	    }
       }
-
-      // Update begin dates
-        // Retrieve old checkin date
-        // Check for schedule conflict
-      // Update end date
-        // Retrieve old checkout date
     }
     // Update number of children
     // Update number of adults
