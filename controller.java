@@ -468,9 +468,38 @@ public class controller {
           kids = rs.getString("Kids");
         }
         System.out.println("---- Current reservation ----");
-        System.out.println("Roomcode\tRoomName\tCheckin\tCheckout\tRate\tLastName\tFirstName\tAdults\tKids");
+        System.out.println("Code\tRoom\tCheckin\tCheckout\tRate\tLastName\tFirstName\tAdults\tKids");
         System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
         roomcode, room, checkin, checkout, rate, lastname, firstname, adults, kids);
+        System.out.println("Are you sure you want to delete this reservation? (y/n)");
+        String answer = scanner.nextLine();
+        if (answer.equals("y") || answer.equals("Y")) {
+          // Remove the reservation
+          String deleteSql = "DELETE FROM lab7lab7_reservations WHERE CODE = ?";
+          conn.setAutoCommit(false);
+          try (PreparedStatement pstmt2 = conn.prepareStatement(deleteSql)) {
+        		pstmt2.setString(1, resnumber);
+        		int rowCount = pstmt2.executeUpdate();
+            if (rowCount > 0) {
+              System.out.println("Reservation successfully removed");
+              conn.commit();
+            } else {
+              System.out.println("Reservation failed to delete.");
+              System.out.println("Please try again");
+              conn.rollback();
+              demo4();
+            }
+          } catch (SQLException e) {
+    		  conn.rollback();
+          }
+        } else if (answer.equals("n") || answer.equals("N")) {
+          System.out.println("You have chosen to keep your reservation");
+          System.out.println("Enjoy your stay :)");
+          return;
+        } else {
+          System.out.println("Invalid option, please try again.");
+          demo4();
+        }
       } catch (SQLException e) {
           conn.rollback();
       }
