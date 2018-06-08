@@ -21,8 +21,8 @@ public class controller {
       controller c = new controller();
       //c.demo1();
       //c.demo2();
-      c.demo3();
-      //c.demo4();
+      //c.demo3();
+      c.demo4();
       //c.demo5();
     } catch (SQLException e) {
   	    System.err.println("SQLException: " + e.getMessage());
@@ -474,6 +474,6 @@ public class controller {
       } catch (SQLException e) {
           conn.rollback();
       }
-    } 
+    }
   }
 }
