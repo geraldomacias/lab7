@@ -198,6 +198,7 @@ public class controller {
   	    }
       }
       else if (fieldchange.equals("begin date") || fieldchange.equals("end date")) {
+        System.out.println("Date change ----");
         // Check for conflict with given dates
         // Create a prepared sql statement
         // TODO This statement needs work
