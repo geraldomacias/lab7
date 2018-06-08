@@ -269,9 +269,9 @@ public class controller {
             // Start transaction
             conn.setAutoCommit(false);
             try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
-              pstmt.setString(1, resnumber);
-              pstmt.setString(2, newarg);
-              pstmt.setString(3, room);
+              psmt2.setString(1, resnumber);
+              psmt2.setString(2, newarg);
+              psmt2.setString(3, room);
       		    ResultSet rs2 = pstmt.executeQuery();
               // If the set is empty, no conflict
               if (!rs2.next()) {
