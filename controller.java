@@ -281,10 +281,12 @@ public class controller {
                 System.out.println("No conflicts with given date " + newarg);
                 String updateSql = "";
                 if (fieldchange.equals("begin date")) {
+                  System.out.println("** Updating checkin date **");
                   updateSql = "UPDATE lab7_reservations " +
                               "SET CheckIn = ? " +
                               "WHERE CODE = ? ";
                 } else {
+                  System.out.println("** Updating checkout date **");
                   updateSql = "UPDATE lab7_reservations " +
                               "SET Checkout = ? " +
                               "WHERE CODE = ? ";
@@ -299,8 +301,10 @@ public class controller {
                   // Step 5: Handle results
                   if (rowCount > 0) {
           		      System.out.println("Updated reservation:" + resnumber);
+                    conn.commit();
                   } else {
                     System.out.println("Error updating reservation");
+                    conn.rollback();
                   }
           	    } catch (SQLException e) {
           		      conn.rollback();
