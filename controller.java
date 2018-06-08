@@ -183,7 +183,6 @@ public class controller {
         }
         // Start transaction
         conn.setAutoCommit(false);
-
         try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
           // Step 4: Send SQL statement to DBMS
           pstmt.setString(1, newarg);
@@ -198,7 +197,7 @@ public class controller {
   	    }
       }
       else if (fieldchange.equals("begin date") || fieldchange.equals("end date")) {
-        System.out.println("Attmepting to change date");
+        System.out.println("** Attmepting to change date **");
         // Check for conflict with given dates
         // Create a prepared sql statement
         // TODO This statement needs work
@@ -261,7 +260,7 @@ public class controller {
           }
           // Dates do not cross eachother
           else {
-            System.out.println("Checkin and Checkout dates do not cross themselves");
+            System.out.println("** Checkin and Checkout dates do not cross themselves **");
             // Check conflict with other reservations
             String sqlcheckdate = "SELECT * FROM lab7_reservations " +
                     "WHERE CODE <> ? AND ? BETWEEN CheckIn AND Checkout " +
@@ -269,7 +268,6 @@ public class controller {
             // Start transaction
             conn.setAutoCommit(false);
             try (PreparedStatement psmt2 = conn.prepareStatement(sqlcheckdate)) {
-              System.out.println("PreparedStatement2");
               psmt2.setString(1, resnumber);
               psmt2.setDate(2, java.sql.Date.valueOf(newarg));
               psmt2.setString(3, room);
@@ -278,7 +276,7 @@ public class controller {
               // If the set is empty, no conflict
               if (!rs2.next()) {
                 // Update the reservation
-                System.out.println("No conflicts with given date " + newarg);
+                System.out.println("** No conflicts with given date " + newarg + " **");
                 String updateSql = "";
                 if (fieldchange.equals("begin date")) {
                   System.out.println("** Updating checkin date **");
@@ -300,7 +298,7 @@ public class controller {
           		    int rowCount = stmt3.executeUpdate();
                   // Step 5: Handle results
                   if (rowCount > 0) {
-          		      System.out.println("Updated reservation:" + resnumber);
+          		      System.out.println("** Updated reservation " + resnumber + " **");
                     conn.commit();
                   } else {
                     System.out.println("Error updating reservation");
