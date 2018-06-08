@@ -103,6 +103,11 @@ public class HastyPastry {
 		 ResultSet rs = stmt.executeQuery(sql)) {
 
 		// Step 5: Receive results
+    if (!rs.next()) {
+      System.out.print("Empty set!");
+    } else {
+      rs.beforeFirst();
+    }
 		while (rs.next()) {
 		    String flavor = rs.getString("Flavor");
 		    String food = rs.getString("Food");
