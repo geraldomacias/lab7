@@ -493,7 +493,7 @@ public class controller {
     		  conn.rollback();
           }
         } else if (answer.equals("n") || answer.equals("N")) {
-          System.out.println("You have chosen to keep your reservation");
+          System.out.println("You have chosen to keep your reservation.");
           System.out.println("Enjoy your stay :)");
           return;
         } else {
