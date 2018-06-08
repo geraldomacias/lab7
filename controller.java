@@ -261,9 +261,10 @@ public class controller {
           }
           // Dates do not cross eachother
           else {
+            System.out.println("Checkin and Checkout dates do not cross themselves");
             // Check conflict with other reservations
             String sqlcheckdate = "SELECT * FROM lab7_reservations " +
-                    "WHERE CODE <> ? AND ? BETWEEN CheckIn AND Checkout" +
+                    "WHERE CODE <> ? AND '?' BETWEEN CheckIn AND Checkout" +
                     "AND Room = ?";
             // Start transaction
             conn.setAutoCommit(false);
