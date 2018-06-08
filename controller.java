@@ -223,6 +223,12 @@ public class controller {
         try (PreparedStatement pstmt = conn.prepareStatement(reservation)) {
           pstmt.setString(1, resnumber);
           ResultSet rs = pstmt.executeQuery();
+          if (!rs.next()) {
+            System.out.print("Invalid room code!\nTerminating program.");
+            return;
+          } else {
+            rs.beforeFirst();
+          }
           // Get current reservation
           while (rs.next()) {
             roomcode = rs.getString("CODE");
@@ -330,16 +336,24 @@ public class controller {
         // Update number of children
         // Update number of adults
         System.out.println("Updating " + fieldchange);
-        // Print current reservations
+        // Convert the given number string to integer
+        int people = Integer.parseInt(newarg);
         String reservation = "SELECT * FROM lab7_reservations WHERE CODE = ?";
         String roomcode, room, checkin, checkout, rate;
         String adults, kids, lastname, firstname;
-        roomcode = room = checkin = checkout = rate = adults = kids = lastname = firstname = "";
+        String updateSql;
+        updateSql = roomcode = room = checkin = checkout = rate = adults = kids = lastname = firstname = "";
         conn.setAutoCommit(false);
         try (PreparedStatement pstmt = conn.prepareStatement(reservation)) {
           pstmt.setString(1, resnumber);
           ResultSet rs = pstmt.executeQuery();
           // Get current reservation
+          if (!rs.next()) {
+            System.out.print("Invalid room code!\nTerminating program.");
+            return;
+          } else {
+            rs.beforeFirst();
+          }
           while (rs.next()) {
             roomcode = rs.getString("CODE");
             room = rs.getString("Room");
@@ -354,6 +368,45 @@ public class controller {
           System.out.println("---- Current reservation ----");
           System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
           roomcode, room, checkin, checkout, rate, lastname, firstname, adults, kids);
+          // Do not allow more than 4 children or less than 0 children per room
+          if (fieldchange.equals("number of children")) {
+            if (people < 0) {
+              System.out.println("Cannot have less than 0 children in a room");
+            } else if (people > 5) {
+              System.out.println("Cannot have more than 4 children per room");
+            } else {
+              updateSql = "UPDATE lab7_reservations " +
+                          "SET Kids = ? " +
+                          "WHERE CODE = ? ";
+            }
+          }
+          // Do not allow less than 1 adult and more than 4 adults
+          else {
+            if (people < 1) {
+              System.out.println("Cannot have less than 1 adult per room");
+            } else if (people > 4) {
+              System.out.println("Cannot have more than 4 adults per room");
+            } else {
+              updateSql = "UPDATE lab7_reservations " +
+                          "SET Adults = ? " +
+                          "WHERE CODE = ? ";
+            }
+          }
+          conn.setAutoCommit(false);
+          try (PreparedStatement pstmt2 = conn.prepareStatement(updateSql)) {
+            pstmt2.setString(1, newarg);
+            pstmt2.setString(2, resnumber);
+            int rowCount = pstmt2.executeUpdate();
+            if (rowCount > 0) {
+              System.out.println("** Updating " + fieldchange + " **");
+              conn.commit();
+            } else {
+              System.out.println("Failed to update reservation");
+              conn.rollback();
+            }
+          } catch (SQLException e) {
+              conn.rollback();
+          }
         } catch (SQLException e) {
             conn.rollback();
         }
