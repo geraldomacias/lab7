@@ -264,7 +264,7 @@ public class controller {
             System.out.println("Checkin and Checkout dates do not cross themselves");
             // Check conflict with other reservations
             String sqlcheckdate = "SELECT * FROM lab7_reservations " +
-                    "WHERE CODE <> ? AND '?' BETWEEN CheckIn AND Checkout" +
+                    "WHERE CODE <> ? AND ? BETWEEN CheckIn AND Checkout " +
                     "AND Room = ?";
             // Start transaction
             conn.setAutoCommit(false);
@@ -274,6 +274,7 @@ public class controller {
               psmt2.setDate(2, java.sql.Date.valueOf(newarg));
               psmt2.setString(3, room);
       		    ResultSet rs2 = psmt2.executeQuery();
+
               // If the set is empty, no conflict
               if (!rs2.next()) {
                 // Update the reservation
