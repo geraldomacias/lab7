@@ -968,7 +968,7 @@ public class controller {
         conditions += ";";
 
         String sql = " SELECT * FROM lab7_reservations " + conditions;
-        System.out.println("The sql query is: " + sql + "\n\n");
+        //System.out.println("The sql query is: " + sql);
 
         try (Statement stmt = conn.createStatement()) {
            // Step 4: Send SQL statement to DBMS
@@ -976,7 +976,7 @@ public class controller {
            // Step 5: Handle results
 
            if (!rs.next()) {
-           System.out.print("No rooms match the current search criteria. Please try again.");
+           System.out.println("No rooms match the current search criteria. Please try again.");
            return;
           } else {
            rs.beforeFirst();
