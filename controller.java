@@ -913,7 +913,7 @@ public class controller {
            if (where == 0){
               conditions += " WHERE ";
               where++;
-           } else{
+           } else {
               conditions += " AND ";
            }
            if (checkIn.indexOf('%') >= 0){
@@ -974,6 +974,13 @@ public class controller {
            // Step 4: Send SQL statement to DBMS
            ResultSet rs = stmt.executeQuery(sql);
            // Step 5: Handle results
+
+           if (!rs.next()) {
+           System.out.print("No rooms match the current search criteria. Please try again.");
+           return;
+          } else {
+           rs.beforeFirst();
+          }
            System.out.format("CODE\t\tRoom\t\tCheckIn\t\tCheckout\t\tRate\t\tLastName\t\tFirstName\t\tAdults\t\tKids\n");
            while(rs.next()) {
              String code1 = rs.getString("CODE");
