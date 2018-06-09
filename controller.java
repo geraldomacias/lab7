@@ -19,12 +19,14 @@ public class controller {
   public static void main(String[] args) {
     try {
       controller c = new controller();
+      // Make an interactive menu for slecting which option to run
+
       //c.demo1();
       //c.demo2();
       //c.demo3();
       //c.demo4();
-      //c.demo5();
-      c.demo6();
+      c.demo5();
+      //c.demo6();
     } catch (SQLException e) {
   	    System.err.println("SQLException: " + e.getMessage());
     }
@@ -813,18 +815,37 @@ public class controller {
   // Requrirement #5
   // ***************************************************************************
   private void demo5() throws SQLException {
+    /*
+    Present the user with a search prompt or form that allows them to
+    enter any combination of the fields listed below
+    (a blank entry should indicate ”Any”).
+    For all fields except dates, permit partial values using SQL LIKE
+    wildcards (for example: GL% should be allowed as a last name search value)
+      • First name
+      • Last name
+      • A range of dates
+      • Room code
+      • Reservation code
+      Using the search information provided,
+      display a list of all matching reservations found in the database.
+      The list shall show the contents of every attribute from the
+      lab7 reservations table (as well as the full name of the room,
+      and any extra information about the room you wish to add).
+    */
      Scanner sc = new Scanner(System.in);
      String firstName, lastName, roomCode, reservationCode, checkIn, checkOut, year, month, day;
-     String conditions ="";
+     String conditions = "";
 
      System.out.println("R5: Detailed Reservation Information ***");
      System.out.println("Enter the options you would like to search for: (leave blank if no prefrence)");
 
+     // Get the customers name
      System.out.println("Customers first name:");
      firstName = sc.nextLine();
      System.out.println("Customers last name:");
      lastName = sc.nextLine();
 
+     // Get the customers beging date
      System.out.println("Begin year of stay:");
      year = sc.nextLine();
      System.out.println("Begin month of stay:");
@@ -833,6 +854,7 @@ public class controller {
      day = sc.nextLine();
      checkIn = year + "-" + month + "-" + day;
 
+     // Get the customers end date
      System.out.println("End year of stay:");
      year = sc.nextLine();
      System.out.println("End month of stay:");
@@ -841,13 +863,13 @@ public class controller {
      day = sc.nextLine();
      checkOut = year + "-" + month + "-" + day;
 
-
+     // Get the customers room code
      System.out.println("Code of desired room:");
      roomCode = sc.nextLine();
      System.out.println("Reservation Code:");
      reservationCode = sc.nextLine();
 
-     try{
+     try {
          Class.forName("com.mysql.jdbc.Driver");
          System.out.println("MySQL JDBC Driver loaded");
      } catch (ClassNotFoundException ex) {
@@ -860,7 +882,7 @@ public class controller {
                           System.getenv("HP_JDBC_PW"))) {
         int where = 0;
         if(firstName.length() != 0){
-           if (where == 0){
+           if (where == 0) {
               conditions += " WHERE ";
               where++;
            } else{
@@ -877,7 +899,7 @@ public class controller {
            if (where == 0){
               conditions += " WHERE ";
               where++;
-           } else{
+           } else {
               conditions += " AND ";
            }
            if (lastName.indexOf('%') >= 0){
@@ -891,7 +913,7 @@ public class controller {
            if (where == 0){
               conditions += " WHERE ";
               where++;
-           } else{
+           } else {
               conditions += " AND ";
            }
            if (checkIn.indexOf('%') >= 0){
@@ -945,16 +967,20 @@ public class controller {
         }
         conditions += ";";
 
-        String sql = " SELECT * FROM lab7_reservations ";
-
-        sql = sql + conditions;
-
-        System.out.println("The sql query is: " + sql + "\n\n");
+        String sql = " SELECT * FROM lab7_reservations " + conditions;
+        //System.out.println("The sql query is: " + sql);
 
         try (Statement stmt = conn.createStatement()) {
            // Step 4: Send SQL statement to DBMS
            ResultSet rs = stmt.executeQuery(sql);
            // Step 5: Handle results
+
+           if (!rs.next()) {
+           System.out.println("No rooms match the current search criteria. Please try again.");
+           return;
+          } else {
+           rs.beforeFirst();
+          }
            System.out.format("CODE\t\tRoom\t\tCheckIn\t\tCheckout\t\tRate\t\tLastName\t\tFirstName\t\tAdults\t\tKids\n");
            while(rs.next()) {
              String code1 = rs.getString("CODE");
@@ -967,7 +993,7 @@ public class controller {
              String adults1 = rs.getString("Adults");
              String kids1 = rs.getString("Kids");
 
-             System.out.format("%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\n", code1, room1, checkIn1, checkOut1, rate1, lastName1, firstName1, adults1, kids1);
+             System.out.format("%s\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\n", code1, room1, checkIn1, checkOut1, rate1, lastName1, firstName1, adults1, kids1);
           }
         }
      }
