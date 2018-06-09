@@ -22,8 +22,9 @@ public class controller {
       //c.demo1();
       //c.demo2();
       //c.demo3();
-      c.demo4();
+      //c.demo4();
       //c.demo5();
+      c.demo6();
     } catch (SQLException e) {
   	    System.err.println("SQLException: " + e.getMessage());
     }
@@ -504,5 +505,230 @@ public class controller {
           conn.rollback();
       }
     }
+  }
+  // ***************************************************************************
+  // Requrirement #5
+  // ***************************************************************************
+
+  // ***************************************************************************
+  // Requrirement #6
+  // ***************************************************************************
+  private void demo6() throws SQLException {
+    /*
+    When this option is selected, your system shall provide a month-by-month
+    overview of revenue for an entire year. For the purpose of this assignment,
+    all revenue from the reservation is assigned to the month and year when the
+    reservation ended. For example a seven-day hotel stay that started
+    on October 30 will be treated as November revenue.
+    Your system shall display a list of rooms, and, for each room,
+    13 columns: 12 columns showing dollar revenue for each month and a
+    13th column to display total year revenue for the room.
+    There shall also be a ”totals” row in the table, which contains column
+    totals. All amounts should be rounded to the nearest whole dollar.
+    */
+    System.out.println("--------------------");
+    System.out.println("-- Revenue report --");
+    System.out.println("--------------------");
+    // Connect to the sql database
+    try {
+  	    Class.forName("com.mysql.jdbc.Driver");
+  	    System.out.println("MySQL JDBC Driver loaded");
+  	} catch (ClassNotFoundException ex) {
+  	    System.err.println("Unable to load JDBC Driver");
+  	    System.exit(-1);
+  	}
+    try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+    							   System.getenv("HP_JDBC_USER"),
+    							   System.getenv("HP_JDBC_PW"))) {
+         String sql = "SELECT * " +
+         "FROM  " +
+           "(SELECT mon2.Room, January, February, March, April, May, June, July, August, September, October, November, December, mon2.Year, Year_Revenue " +
+           "FROM " +
+             "(SELECT * " +
+             "FROM " +
+               "(SELECT Room, " +
+                 "MAX(CASE WHEN (Month = 'January' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS January, " +
+                 "MAX(CASE WHEN (Month = 'February' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS February, " +
+                 "MAX(CASE WHEN (Month = 'March' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS March, " +
+                 "MAX(CASE WHEN (Month = 'April' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS April, " +
+                 "MAX(CASE WHEN (Month = 'May' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS May, " +
+                 "MAX(CASE WHEN (Month = 'June' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS June, " +
+                 "MAX(CASE WHEN (Month = 'July' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS July, " +
+                 "MAX(CASE WHEN (Month = 'August' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS August, " +
+                 "MAX(CASE WHEN (Month = 'September' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS September, " +
+                 "MAX(CASE WHEN (Month = 'October' AND YEAR = 2018)  THEN Month_Revenue ELSE NULL END) AS October, " +
+                 "MAX(CASE WHEN (Month = 'November' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS November, " +
+                 "MAX(CASE WHEN (Month = 'December' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS December, " +
+                 "2018 AS Year " +
+               "FROM " +
+                 "(SELECT * " +
+                 "FROM " +
+                   "(SELECT Room, Year, Month, ROUND(SUM(Revenue), 2) AS Month_Revenue " +
+                   "FROM " +
+                     "(SELECT Room, MONTHNAME(Checkout) AS Month, YEAR(Checkout) AS Year, DATEDIFF(Checkout, Checkin) AS Days, Rate, (DATEDIFF(Checkout, Checkin) * Rate) AS Revenue " +
+                     "FROM lab7_reservations) AS a " +
+                   "GROUP BY Room, Year, Month) AS a " +
+                 "UNION " +
+                   "(SELECT DISTINCT Room, 2019 AS Year, MONTHNAME(STR_TO_DATE(Month, '%m')) AS Month, 0.00 AS Year_Revenue " +
+                   "FROM " +
+                     "(SELECT DISTINCT Room, MONTH(Checkout) AS Month " +
+                     "FROM lab7_reservations " +
+                     "WHERE MONTH(Checkout)  > 1) AS m1)) AS mon2 " +
+                     "GROUP BY Room) AS t18 " +
+            "UNION " +
+               "(SELECT Room, " +
+                 "MAX(CASE WHEN (Month = 'January' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS January, " +
+                 "MAX(CASE WHEN (Month = 'February' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS February, " +
+                 "MAX(CASE WHEN (Month = 'March' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS March, " +
+                 "MAX(CASE WHEN (Month = 'April' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS April, " +
+                 "MAX(CASE WHEN (Month = 'May' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS May, " +
+                 "MAX(CASE WHEN (Month = 'June' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS June, " +
+                 "MAX(CASE WHEN (Month = 'July' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS July, " +
+                 "MAX(CASE WHEN (Month = 'August' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS August, " +
+                 "MAX(CASE WHEN (Month = 'September' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS September, " +
+                 "MAX(CASE WHEN (Month = 'October' AND YEAR = 2019)  THEN Month_Revenue ELSE NULL END) AS October, " +
+                 "MAX(CASE WHEN (Month = 'November' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS November, " +
+                 "MAX(CASE WHEN (Month = 'December' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS December, " +
+                 "2019 AS Year " +
+               "FROM  " +
+                 "(SELECT * " +
+                 "FROM " +
+                   "(SELECT Room, Year, Month, ROUND(SUM(Revenue), 2) AS Month_Revenue " +
+                   "FROM " +
+                     "(SELECT Room, MONTHNAME(Checkout) AS Month, YEAR(Checkout) AS Year, DATEDIFF(Checkout, Checkin) AS Days, Rate, (DATEDIFF(Checkout, Checkin) * Rate) AS Revenue " +
+                     "FROM lab7_reservations) AS a " +
+                   "GROUP BY Room, Year, Month) AS a " +
+                 "UNION " +
+                   "(SELECT DISTINCT Room, 2019 AS Year, MONTHNAME(STR_TO_DATE(Month, '%m')) AS Month, 0.00 AS Year_Revenue " +
+                   "FROM " +
+                     "(SELECT DISTINCT Room, MONTH(Checkout) AS Month " +
+                     "FROM lab7_reservations " +
+                     "WHERE MONTH(Checkout)  > 1) AS m1)) AS mon2 " +
+                     "GROUP BY Room)) as mon2 " +
+           "LEFT OUTER JOIN " +
+             "(SELECT Room, Year, ROUND(SUM(Revenue), 2) AS Year_Revenue " +
+             "FROM " +
+               "(SELECT Room, MONTHNAME(Checkout) AS Month, YEAR(Checkout) AS Year, DATEDIFF(Checkout, Checkin) AS Days, Rate, (DATEDIFF(Checkout, Checkin) * Rate) AS Revenue " +
+               "FROM lab7_reservations) AS a " +
+             "GROUP BY Year, Room " +
+             "ORDER BY Year, Room) AS ye " +
+           "ON mon2.Room = ye.Room AND mon2.Year = ye.Year " +
+           "ORDER BY Year, mon2.Room) AS a " +
+       "UNION  " +
+         "(SELECT 'Total' AS Month,  " +
+           "SUM(January) AS January,  " +
+           "SUM(February) AS February,  " +
+           "SUM(March) AS March,  " +
+           "SUM(April) AS April,  " +
+           "SUM(May) AS May,  " +
+           "SUM(June) AS June,  " +
+           "SUM(July) AS July,  " +
+           "SUM(August) AS August,  " +
+           "SUM(September) AS September,  " +
+           "SUM(October) AS October,  " +
+           "SUM(November) AS November,  " +
+           "SUM(December) AS December, " +
+           "'----' AS Year, " +
+           "SUM(Year_Revenue) AS Year_Revenue " +
+         "FROM " +
+           "(SELECT mon2.Room, January, February, March, April, May, June, July, August, September, October, November, December, mon2.Year, Year_Revenue " +
+           "FROM " +
+             "(SELECT * " +
+             "FROM " +
+               "(SELECT Room, " +
+                 "MAX(CASE WHEN (Month = 'January' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS January, " +
+                 "MAX(CASE WHEN (Month = 'February' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS February, " +
+                 "MAX(CASE WHEN (Month = 'March' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS March, " +
+                 "MAX(CASE WHEN (Month = 'April' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS April, " +
+                 "MAX(CASE WHEN (Month = 'May' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS May, " +
+                 "MAX(CASE WHEN (Month = 'June' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS June, " +
+                 "MAX(CASE WHEN (Month = 'July' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS July, " +
+                 "MAX(CASE WHEN (Month = 'August' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS August, " +
+                 "MAX(CASE WHEN (Month = 'September' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS September, " +
+                 "MAX(CASE WHEN (Month = 'October' AND YEAR = 2018)  THEN Month_Revenue ELSE NULL END) AS October, " +
+                 "MAX(CASE WHEN (Month = 'November' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS November, " +
+                 "MAX(CASE WHEN (Month = 'December' AND YEAR = 2018) THEN Month_Revenue ELSE NULL END) AS December, " +
+                 "2018 AS Year " +
+               "FROM " +
+                 "(SELECT * " +
+                 "FROM " +
+                   "(SELECT Room, Year, Month, ROUND(SUM(Revenue), 2) AS Month_Revenue " +
+                   "FROM " +
+                     "(SELECT Room, MONTHNAME(Checkout) AS Month, YEAR(Checkout) AS Year, DATEDIFF(Checkout, Checkin) AS Days, Rate, (DATEDIFF(Checkout, Checkin) * Rate) AS Revenue " +
+                     "FROM lab7_reservations) AS a " +
+                   "GROUP BY Room, Year, Month) AS a " +
+                 "UNION " +
+                   "(SELECT DISTINCT Room, 2019 AS Year, MONTHNAME(STR_TO_DATE(Month, '%m')) AS Month, 0.00 AS Year_Revenue " +
+                   "FROM " +
+                     "(SELECT DISTINCT Room, MONTH(Checkout) AS Month " +
+                     "FROM lab7_reservations " +
+                     "WHERE MONTH(Checkout)  > 1) AS m1)) AS mon2 " +
+                     "GROUP BY Room) AS t18 " +
+             "UNION " +
+               "(SELECT Room, " +
+                 "MAX(CASE WHEN (Month = 'January' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS January, " +
+                 "MAX(CASE WHEN (Month = 'February' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS February, " +
+                 "MAX(CASE WHEN (Month = 'March' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS March, " +
+                 "MAX(CASE WHEN (Month = 'April' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS April, " +
+                 "MAX(CASE WHEN (Month = 'May' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS May, " +
+                 "MAX(CASE WHEN (Month = 'June' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS June, " +
+                 "MAX(CASE WHEN (Month = 'July' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS July, " +
+                 "MAX(CASE WHEN (Month = 'August' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS August, " +
+                 "MAX(CASE WHEN (Month = 'September' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS September, " +
+                 "MAX(CASE WHEN (Month = 'October' AND YEAR = 2019)  THEN Month_Revenue ELSE NULL END) AS October, " +
+                 "MAX(CASE WHEN (Month = 'November' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS November, " +
+                 "MAX(CASE WHEN (Month = 'December' AND YEAR = 2019) THEN Month_Revenue ELSE NULL END) AS December, " +
+                 "2019 AS Year " +
+               "FROM " +
+                 "(SELECT * " +
+                 "FROM " +
+                   "(SELECT Room, Year, Month, ROUND(SUM(Revenue), 2) AS Month_Revenue " +
+                   "FROM " +
+                     "(SELECT Room, MONTHNAME(Checkout) AS Month, YEAR(Checkout) AS Year, DATEDIFF(Checkout, Checkin) AS Days, Rate, (DATEDIFF(Checkout, Checkin) * Rate) AS Revenue " +
+                     "FROM lab7_reservations) AS a " +
+                   "GROUP BY Room, Year, Month) AS a " +
+                 "UNION " +
+                   "(SELECT DISTINCT Room, 2019 AS Year, MONTHNAME(STR_TO_DATE(Month, '%m')) AS Month, 0.00 AS Year_Revenue " +
+                   "FROM " +
+                     "(SELECT DISTINCT Room, MONTH(Checkout) AS Month " +
+                     "FROM lab7_reservations " +
+                     "WHERE MONTH(Checkout)  > 1) AS m1)) AS mon2 " +
+                     "GROUP BY Room)) as mon2 " +
+           "LEFT OUTER JOIN " +
+             "(SELECT Room, Year, ROUND(SUM(Revenue), 2) AS Year_Revenue " +
+             "FROM " +
+               "(SELECT Room, MONTHNAME(Checkout) AS Month, YEAR(Checkout) AS Year, DATEDIFF(Checkout, Checkin) AS Days, Rate, (DATEDIFF(Checkout, Checkin) * Rate) AS Revenue " +
+               "FROM lab7_reservations) AS a " +
+             "GROUP BY Year, Room " +
+             "ORDER BY Year, Room) AS ye " +
+           "ON mon2.Room = ye.Room AND mon2.Year = ye.Year " +
+           "ORDER BY Year, mon2.Room) as p) ";
+
+           try (Statement stmt = conn.createStatement()) {
+     		      // Step 4: Send SQL statement to DBMS
+     		      ResultSet rs = stmt.executeQuery(sql);
+     		      // Step 5: Handle results
+               System.out.format("Room\tJan\tFeb\tMar\tApr\tMay\tJune\tJulyy\tAug\tSept\tOct\tNov\tDec\tYear\tRev\n");
+               while(rs.next()) {
+                 String room = rs.getString("Room");
+                 String jan = rs.getString("January");
+                 String feb = rs.getString("February");
+                 String mar = rs.getString("March");
+                 String apr = rs.getString("April");
+                 String may = rs.getString("May");
+                 String june = rs.getString("June");
+                 String july = rs.getString("July");
+                 String aug = rs.getString("August");
+                 String sept = rs.getString("September");
+                 String oct = rs.getString("October");
+                 String nov = rs.getString("November");
+                 String dec = rs.getString("December");
+                 String year = rs.getString("Year");
+                 String rev = rs.getString("Year_Revenue");
+
+                 System.out.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", room, jan, feb, mar, apr, may, june, july, aug, sept, oct, nov, dec, year, rev);
+               }
+          }
+      }
   }
 }
