@@ -525,7 +525,7 @@ public class controller {
       System.out.println("Enter the updated value");
       String newarg = scanner.nextLine();
 
-      System.out.println("fieldchange:" + fieldchange);
+      //System.out.println("fieldchange:" + fieldchange);
 
       // Update first name
       // Update last name
