@@ -986,7 +986,7 @@ public class controller {
              String adults1 = rs.getString("Adults");
              String kids1 = rs.getString("Kids");
 
-             System.out.format("%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\n", code1, room1, checkIn1, checkOut1, rate1, lastName1, firstName1, adults1, kids1);
+             System.out.format("%s\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\n", code1, room1, checkIn1, checkOut1, rate1, lastName1, firstName1, adults1, kids1);
           }
         }
      }
