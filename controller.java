@@ -118,9 +118,18 @@ public class controller {
            "WHERE DATEDIFF(CURRENT_DATE, Checkout) < 180 AND CURRENT_DATE < CheckIn " +
            "GROUP BY Room) AS a " +
          "JOIN " +
-          "((SELECT Room, DATEDIFF(Checkout, CURRENT_DATE) AS days " +
-           "FROM lab7_reservations " +
-           "WHERE CURRENT_DATE BETWEEN CheckIn AND Checkout) " +
+         "((SELECT Room, SUM(days) AS days " +
+         "FROM  " +
+           "(SELECT * " +
+           "FROM  " +
+             "(SELECT Room, DATEDIFF(CURRENT_DATE, CheckIn) AS days " +
+             "FROM lab7_reservations " +
+             "WHERE DATE_SUB(CURRENT_DATE, INTERVAL 180 DAY) BETWEEN CheckIn AND Checkout) AS a " +
+           "UNION " +
+             "(SELECT Room, DATEDIFF(Checkout, CURRENT_DATE) AS days " +
+             "FROM lab7_reservations " +
+             "WHERE CURRENT_DATE BETWEEN CheckIn AND Checkout)) AS a " +
+         "GROUP BY Room) " +
            "UNION " +
            "(SELECT DISTINCT Room, 0 AS days " +
            "FROM lab7_reservations " +
@@ -128,7 +137,7 @@ public class controller {
             "(SELECT DISTINCT Room " +
             "FROM lab7_reservations " +
             "WHERE CURRENT_DATE BETWEEN CheckIn AND Checkout))) as b " +
-           "ON a.Room = b.room) AS parta " +
+         "ON a.Room = b.room) AS parta " +
         "ON a.Room = parta.Room " +
         "JOIN lab7_rooms AS roo " +
         "ON a.Room = roo.RoomCode " +
