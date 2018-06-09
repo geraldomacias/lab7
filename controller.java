@@ -17,15 +17,11 @@ public class controller {
       // Make an interactive menu for slecting which option to run
 
       //c.demo1();
-      //c.demo2();
+      c.demo2();
       //c.demo3();
       //c.demo4();
-      c.demo5();
-<<<<<<< HEAD
+      // c.demo5();
       // c.demo6();
-=======
-      //c.demo6();
->>>>>>> 0a2c7bfb6240d9ee109b8f3a295dcb86b7474601
     } catch (SQLException e) {
   	    System.err.println("SQLException: " + e.getMessage());
     }
@@ -136,11 +132,9 @@ public class controller {
   private void demo2() throws SQLException {
      String days_1, base_rate_1, room_code_1;
      Scanner sc = new Scanner(System.in);
-     String firstName, lastName, roomCode, bedType, checkIn, checkOut, year, month, day;
+     String firstName, lastName, roomCode, bedType, checkIn, checkOut, year, month, day, sql;
      String roomChoice[] = new String[10];
      String roomSuggestions[] = new String[5];
-     String sql;
-
 
      int kids, adults, i, occupancy;
 
@@ -228,17 +222,38 @@ public class controller {
                         " GROUP BY R.RoomCode; ";
         } else {
            sql =
-                        " SELECT R.RoomName " +
-                        " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
-                        " WHERE RES.Room = R.RoomCode " +
-                        " AND '" + checkIn +
-                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
-                        " AND '" + checkOut +
-                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
-                        " AND R.bedType = '" + bedType +
-                        "' AND R.maxOcc >= " + occupancy +
-                        " GROUP BY R.RoomCode; ";
+                  " SELECT R.RoomName " +
+                  " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+                  " WHERE RES.Room = R.RoomCode " +
+                  " AND '" + checkIn +
+                  "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                  " AND '" + checkOut +
+                  "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                  " AND R.bedType = '" + bedType +
+                  "' AND R.maxOcc >= " + occupancy +
+                  " GROUP BY R.RoomCode; ";
         }
+
+        // sql = " SELECT R.RoomName " +
+        //        " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+        //        " WHERE RES.Room = R.RoomCode " +
+        //        " AND '" + checkIn +
+        //        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+        //        " AND '" + checkOut +
+        //        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+        //        "' AND R.maxOcc >= " + occupancy;
+        //
+        // if (bedType != "Any"){
+        //    sql += " AND R.bedType = '" + bedType;
+        // }
+        // if (roomCode != "Any"){
+        //    sql += " AND R.RoomCode = '" + roomCode;
+        // }
+        //
+        // sql += " GROUP BY R.RoomCode; ";
+        //
+        // System.out.println("SQL: " + sql);
+
 
 
         // Step 3: (omitted in this example) Start transaction
@@ -332,7 +347,6 @@ public class controller {
                  i++;
               }
            }
-
         }
 
         System.out.println("Which room would you like? (Pick a number)");
