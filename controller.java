@@ -58,7 +58,7 @@ public class controller {
       } catch (SQLException e) {
          System.err.println("SQLException: " + e.getMessage());
       }
-    } while (input > 0);
+    } while (input < 0);
   }
   // ***************************************************************************
   // Requrirement #1
