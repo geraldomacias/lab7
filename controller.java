@@ -12,20 +12,48 @@ import java.text.SimpleDateFormat;
 
 public class controller {
   public static void main(String[] args) {
-    try {
-      controller c = new controller();
-      // Make an interactive menu for slecting which option to run
+    controller c = new controller();
+    Scanner keyboard = new Scanner(System.in);
+    int input = 0;
 
-      //c.demo1();
-      //c.demo2();
-      //c.demo3();
-      //c.demo4();
-      c.demo5();
-<<<<<<< HEAD
-      // c.demo6();
-=======
-      //c.demo6();
->>>>>>> 0a2c7bfb6240d9ee109b8f3a295dcb86b7474601
+    // Make an interactive menu for slecting which option to run
+    System.out.println("********* Welcome to Geraldo's and Luis' lab7 from " +
+                      " csc365spring2018 *********");
+    do {
+      System.out.println("Please select one of the following menu options.");
+      System.out.println("[1] Rooms and Rates");
+      System.out.println("[2] Reservations");
+      System.out.println("[3] Reservation Change");
+      System.out.println("[4] Reservation Cancellation");
+      System.out.println("[5] Detailed Reservation Information");
+      System.out.println("[6] Revenue");
+      System.out.println("[0] to exit");
+      input = keyboard.nextInt();
+      try {
+        if (input == 1) {
+          c.demo1();
+        } else if (input == 2) {
+          c.demo2();
+        } else if  (input == 3) {
+          c.demo3();
+        } else if (input == 4) {
+          c.demo4();
+        } else if (input == 5) {
+          c.demo5();
+        } else if (input == 6) {
+          c.demo6();
+        } else if (input == 0) {
+          System.out.println("Terminating program");
+          return;
+        } else {
+          System.out.println("Invalid menu option.");
+          System.out.println("Please try again.");
+          input = -1;
+        }
+      } catch (SQLException e) {
+         System.err.println("SQLException: " + e.getMessage());
+      }
+    } while (input < 0);
     } catch (SQLException e) {
   	    System.err.println("SQLException: " + e.getMessage());
     }
@@ -70,7 +98,7 @@ public class controller {
          "AND CURRENT_DATE BETWEEN a.CheckIn AND a.Checkout " +
          "GROUP BY a.Room)) AS partb " +
         "ON a.Room = partb.Room " +
-        "JOIN " +
+        "RIGHT OUTER JOIN " +
          "(SELECT a.Room, DATEDIFF(Checkout, CheckIn) AS recent_stay_day_count, Checkout " +
          "FROM lab7_reservations AS a " +
          "JOIN " +
@@ -88,9 +116,18 @@ public class controller {
            "WHERE DATEDIFF(CURRENT_DATE, Checkout) < 180 AND CURRENT_DATE < CheckIn " +
            "GROUP BY Room) AS a " +
          "JOIN " +
-          "((SELECT Room, DATEDIFF(Checkout, CURRENT_DATE) AS days " +
-           "FROM lab7_reservations " +
-           "WHERE CURRENT_DATE BETWEEN CheckIn AND Checkout) " +
+         "((SELECT Room, SUM(days) AS days " +
+         "FROM  " +
+           "(SELECT * " +
+           "FROM  " +
+             "(SELECT Room, DATEDIFF(CURRENT_DATE, CheckIn) AS days " +
+             "FROM lab7_reservations " +
+             "WHERE DATE_SUB(CURRENT_DATE, INTERVAL 180 DAY) BETWEEN CheckIn AND Checkout) AS a " +
+           "UNION " +
+             "(SELECT Room, DATEDIFF(Checkout, CURRENT_DATE) AS days " +
+             "FROM lab7_reservations " +
+             "WHERE CURRENT_DATE BETWEEN CheckIn AND Checkout)) AS a " +
+         "GROUP BY Room) " +
            "UNION " +
            "(SELECT DISTINCT Room, 0 AS days " +
            "FROM lab7_reservations " +
@@ -98,7 +135,7 @@ public class controller {
             "(SELECT DISTINCT Room " +
             "FROM lab7_reservations " +
             "WHERE CURRENT_DATE BETWEEN CheckIn AND Checkout))) as b " +
-           "ON a.Room = b.room) AS parta " +
+         "ON a.Room = b.room) AS parta " +
         "ON a.Room = parta.Room " +
         "JOIN lab7_rooms AS roo " +
         "ON a.Room = roo.RoomCode " +
