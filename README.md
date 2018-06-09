@@ -21,6 +21,6 @@ PW=365Spring18_002837090
 	* You will be greeted by some text. Press 0-6 for valid options which are given.
 	* Program will run in a loop until 0 is entered at the main menu
 [4] Bugs:
-	For all table outputs, fields are not formatetted prefectly.
-	R5 & R2: does not use prepared statements and is susceptible to SQL injection.
-   R2: missing "Any" and "Max Occupancy" features
+	*For all table outputs, fields are not formatetted prefectly.
+	*R5 & R2: does not use prepared statements and is susceptible to SQL injection.
+   *R2: missing "Any" and "Max Occupancy" features
