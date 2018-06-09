@@ -132,6 +132,309 @@ public class controller {
   // ***************************************************************************
   // Requrirement #2
   // ***************************************************************************
+  private void demo2() throws SQLException {
+     String days_1, base_rate_1, room_code_1;
+     Scanner sc = new Scanner(System.in);
+     String firstName, lastName, roomCode, bedType, checkIn, checkOut, year, month, day;
+     String roomChoice[] = new String[10];
+     String roomSuggestions[] = new String[5];
+     String sql;
+
+
+     int kids, adults, i, occupancy;
+
+     // Step 0: Load MySQL JDBC Driver
+     // No longer required as of JDBC 2.0  / Java 6
+     System.out.println("R2: Reservations ***********");
+     try{
+         Class.forName("com.mysql.jdbc.Driver");
+         System.out.println("MySQL JDBC Driver loaded");
+     } catch (ClassNotFoundException ex) {
+         System.err.println("Unable to load JDBC Driver");
+         System.exit(-1);
+     }
+     // Step 1: Establish connection to RDBMS
+     try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+                          System.getenv("HP_JDBC_USER"),
+                          System.getenv("HP_JDBC_PW"))) {
+        // Step 2: Construct SQL statement
+        System.out.println("Customers first name:");
+        firstName = sc.nextLine();
+        System.out.println("Customers last name:");
+        lastName = sc.nextLine();
+        System.out.println("Code of desired room:");
+        roomCode = sc.nextLine();
+        System.out.println("Desired bed type:");
+        bedType = sc.nextLine();
+
+        System.out.println("Begin year of stay:");
+        year = sc.nextLine();
+        System.out.println("Begin month of stay:");
+        month = sc.nextLine();
+        System.out.println("Begin day of stay:");
+        day = sc.nextLine();
+        checkIn = year + "-" + month + "-" + day;
+
+        System.out.println("End year of stay:");
+        year = sc.nextLine();
+        System.out.println("End month of stay:");
+        month = sc.nextLine();
+        System.out.println("End day of stay:");
+        day = sc.nextLine();
+        checkOut = year + "-" + month + "-" + day;
+
+        System.out.println("Number of kids:");
+        kids = sc.nextInt();
+        System.out.println("Number of adults:");
+        adults = sc.nextInt();
+        occupancy = kids + adults;
+
+        // TODO: wont work if both are "Any"
+        if (roomCode == "Any"){
+           sql =
+                        " SELECT R.RoomName " +
+                        " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+                        " WHERE RES.Room = R.RoomCode " +
+                        " AND '" + checkIn +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " AND '" + checkOut +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " GROUP BY R.RoomCode; ";
+        } else {
+           sql =
+                        " SELECT R.RoomName " +
+                        " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+                        " WHERE RES.Room = R.RoomCode " +
+                        " AND '" + checkIn +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " AND '" + checkOut +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " AND R.bedType = '" + bedType +
+                        "' AND R.maxOcc >= " + occupancy +
+                        " GROUP BY R.RoomCode; ";
+        }
+
+
+        if (bedType == "Any"){
+           sql =
+                        " SELECT R.RoomName " +
+                        " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+                        " WHERE RES.Room = R.RoomCode " +
+                        " AND '" + checkIn +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " AND '" + checkOut +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " GROUP BY R.RoomCode; ";
+        } else {
+           sql =
+                        " SELECT R.RoomName " +
+                        " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+                        " WHERE RES.Room = R.RoomCode " +
+                        " AND '" + checkIn +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " AND '" + checkOut +
+                        "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+                        " AND R.bedType = '" + bedType +
+                        "' AND R.maxOcc >= " + occupancy +
+                        " GROUP BY R.RoomCode; ";
+        }
+
+
+        // Step 3: (omitted in this example) Start transaction
+        try (Statement stmt = conn.createStatement()) {
+
+           // Step 4: Send SQL statement to DBMS
+           ResultSet rs = stmt.executeQuery(sql);
+           // Step 5: Handle results
+           i = 0;
+           System.out.format("\n\nAvailable rooms:\n");
+           while(rs.next()) {
+              String roomname = rs.getString("RoomName");
+              System.out.print(i + ": ");
+              System.out.format("%s\n", roomname);
+              roomChoice[i] = roomname;
+              i++;
+           }
+        }
+
+        // If there are no mathces! Find 5 with less restraints
+        if (i == 0){
+           sql = " SELECT R.RoomName " +
+           " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+           " WHERE RES.Room = R.RoomCode " +
+           " AND '" + checkIn +
+           "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+           " AND '" + checkOut +
+           "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+           "' AND R.maxOcc >= " + occupancy +
+           " GROUP BY R.RoomCode; ";
+           try (Statement stmt = conn.createStatement()) {
+
+              // Step 4: Send SQL statement to DBMS
+              ResultSet rs = stmt.executeQuery(sql);
+              // Step 5: Handle results
+              System.out.format("\n\nAvailable rooms:\n");
+              while(rs.next()) {
+                 if (i == 5){
+                    break;
+                 }
+                 String roomname = rs.getString("RoomName");
+                 System.out.print(i + ": ");
+                 System.out.format("%s\n", roomname);
+                 roomSuggestions[i] = roomname;
+                 i++;
+              }
+           }
+
+           sql = " SELECT R.RoomName " +
+           " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+           " WHERE RES.Room = R.RoomCode " +
+           " AND '" + checkIn +
+           "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+           " AND '" + checkOut +
+           "' NOT BETWEEN RES.CheckIn AND RES.CheckOut " +
+           " GROUP BY R.RoomCode; ";
+           try (Statement stmt = conn.createStatement()) {
+
+              // Step 4: Send SQL statement to DBMS
+              ResultSet rs = stmt.executeQuery(sql);
+              // Step 5: Handle results
+              while(rs.next()) {
+                 if (i == 5){
+                    break;
+                 }
+                 String roomname = rs.getString("RoomName");
+                 System.out.print(i + ": ");
+                 System.out.format("%s\n", roomname);
+                 roomSuggestions[i] = roomname;
+                 i++;
+              }
+           }
+
+           sql = " SELECT R.RoomName " +
+           " FROM lab7_reservations AS  RES, lab7_rooms AS R " +
+           " WHERE RES.Room = R.RoomCode " +
+           " GROUP BY R.RoomCode; ";
+           try (Statement stmt = conn.createStatement()) {
+
+              // Step 4: Send SQL statement to DBMS
+              ResultSet rs = stmt.executeQuery(sql);
+              // Step 5: Handle results
+              while(rs.next()) {
+                 if (i == 5){
+                    break;
+                 }
+                 String roomname = rs.getString("RoomName");
+                 System.out.print(i + ": ");
+                 System.out.format("%s\n", roomname);
+                 roomSuggestions[i] = roomname;
+                 i++;
+              }
+           }
+
+        }
+
+        System.out.println("Which room would you like? (Pick a number)");
+        int roomNumber = sc.nextInt();
+
+        String days  =
+        "SELECT DATEDIFF('" + checkOut + "' , '" + checkIn +
+        "') AS DateDiff;" ;
+
+        try (Statement stmt = conn.createStatement()) {
+           // Step 4: Send SQL statement to DBMS
+           ResultSet rs = stmt.executeQuery(days);
+
+           rs.next();
+           days_1 = rs.getString("DateDiff");
+           // System.out.format("%s\n", days_1);
+           // Step 5: Handle results
+        }
+
+
+        String base_rate = "SELECT basePrice " +
+        " FROM lab7_rooms " +
+        " WHERE RoomName = " + "'" + roomChoice[roomNumber] +
+        "';";
+        try (Statement stmt = conn.createStatement()) {
+           // Step 4: Send SQL statement to DBMS
+           ResultSet rs = stmt.executeQuery(base_rate);
+           rs.next();
+           base_rate_1 = rs.getString("basePrice");
+           // System.out.format("%s\n", /*row_number,*/ base_rate_1);
+
+           // Step 5: Handle results
+        }
+
+        String room_code = "SELECT RoomCode " +
+        " FROM lab7_rooms " +
+        "WHERE RoomName =" + "'" + roomChoice[roomNumber] +
+        "';";
+        try (Statement stmt = conn.createStatement()) {
+           // Step 4: Send SQL statement to DBMS
+           ResultSet rs = stmt.executeQuery(room_code);
+           rs.next();
+           room_code_1 = rs.getString("RoomCode");
+           // System.out.format("%s\n", /*row_number,*/ room_code_1);
+
+           // Step 5: Handle results
+        }
+
+        double booking_rate = (Float.parseFloat(days_1) * Float.parseFloat(base_rate_1)) + (.18 * Float.parseFloat(base_rate_1));
+
+        /*Number of weekend days * (110% of the room base rate) -------------TODO*/
+
+
+        System.out.println("\nConfirmation for:" );
+        System.out.println("Customer: " + firstName + " " + lastName);
+        System.out.println("Room: " + room_code_1 + " " + roomChoice[roomNumber] + " ");
+        System.out.println("From: " + checkIn + " to " +checkOut);
+        System.out.println("Adults: " + adults);
+        System.out.println("Children: " + kids);
+        System.out.println("Rate: " + booking_rate);
+
+        System.out.println("\n-----------------------");
+        System.out.println("0: Place reservation\n1: Cancel");
+        System.out.println("-----------------------\n");
+        int confirmation = sc.nextInt();
+
+        Random r = new Random();
+        int low = 0;
+        int high = 10000;
+        int result = r.nextInt(high - low) + low;
+
+        if (confirmation == 0) {
+           String insertSql = "INSERT INTO lab7_reservations " +
+           " VALUES (" +
+           String.format("%05d", result) + " , '" +
+           room_code_1 + "' , " +
+           "'" + checkIn + "'" + "," +
+           "'" + checkOut + "'" + "," +
+           booking_rate + "," +
+           "'" + lastName + "'" + "," +
+           "'" + firstName + "'" + "," +
+           adults + "," + kids + ");";
+
+           System.out.println(insertSql);
+           try (Statement stmt = conn.createStatement()) {
+
+              // Step 4: Send SQL statement to DBMS
+              // boolean exRes = stmt.execute(sql);
+              int ru = stmt.executeUpdate(insertSql);
+              // TODO
+           }
+        }
+        else if (confirmation == 1){
+           System.out.println("Going back to main menu...");
+        }
+        else {
+           System.out.println("Wrong input...quiting....");
+        }
+
+        // Step 6: (omitted in this example) Commit or rollback transaction
+     }
+     // Step 7: Close connection (handled by try-with-resources syntax)
+  }
 
 
   // ***************************************************************************
@@ -509,6 +812,166 @@ public class controller {
   // ***************************************************************************
   // Requrirement #5
   // ***************************************************************************
+  private void demo5() throws SQLException {
+     Scanner sc = new Scanner(System.in);
+     String firstName, lastName, roomCode, reservationCode, checkIn, checkOut, year, month, day;
+     String conditions ="";
+
+     System.out.println("R5: Detailed Reservation Information ***");
+     System.out.println("Enter the options you would like to search for: (leave blank if no prefrence)");
+
+     System.out.println("Customers first name:");
+     firstName = sc.nextLine();
+     System.out.println("Customers last name:");
+     lastName = sc.nextLine();
+
+     System.out.println("Begin year of stay:");
+     year = sc.nextLine();
+     System.out.println("Begin month of stay:");
+     month = sc.nextLine();
+     System.out.println("Begin day of stay:");
+     day = sc.nextLine();
+     checkIn = year + "-" + month + "-" + day;
+
+     System.out.println("End year of stay:");
+     year = sc.nextLine();
+     System.out.println("End month of stay:");
+     month = sc.nextLine();
+     System.out.println("End day of stay:");
+     day = sc.nextLine();
+     checkOut = year + "-" + month + "-" + day;
+
+
+     System.out.println("Code of desired room:");
+     roomCode = sc.nextLine();
+     System.out.println("Reservation Code:");
+     reservationCode = sc.nextLine();
+
+     try{
+         Class.forName("com.mysql.jdbc.Driver");
+         System.out.println("MySQL JDBC Driver loaded");
+     } catch (ClassNotFoundException ex) {
+         System.err.println("Unable to load JDBC Driver");
+         System.exit(-1);
+     }
+
+     try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+                          System.getenv("HP_JDBC_USER"),
+                          System.getenv("HP_JDBC_PW"))) {
+        int where = 0;
+        if(firstName.length() != 0){
+           if (where == 0){
+              conditions += " WHERE ";
+              where++;
+           } else{
+              conditions += " AND ";
+           }
+           if (firstName.indexOf('%') >= 0){
+             conditions += " FirstName LIKE '" + firstName + "' ";
+           }
+           else {
+             conditions += " FirstName = '" + firstName + "' ";
+          }
+        }
+        if(lastName.length() != 0){
+           if (where == 0){
+              conditions += " WHERE ";
+              where++;
+           } else{
+              conditions += " AND ";
+           }
+           if (lastName.indexOf('%') >= 0){
+             conditions += " LastName LIKE '" + lastName + "' ";
+           }
+           else {
+             conditions += " LastName = '" + lastName + "' ";
+           }
+        }
+        if(checkIn.length() == 10){
+           if (where == 0){
+              conditions += " WHERE ";
+              where++;
+           } else{
+              conditions += " AND ";
+           }
+           if (checkIn.indexOf('%') >= 0){
+             conditions += " CheckIn LIKE '" + checkIn + "' ";
+           }
+           else {
+             conditions += " CheckIn = '" + checkIn + "' ";
+            }
+        }
+        if(checkOut.length() == 10){
+           if (where == 0){
+              conditions += " WHERE ";
+              where++;
+           } else{
+              conditions += " AND ";
+           }
+           if (checkOut.indexOf('%') >= 0){
+             conditions += " CheckOut LIKE '" + checkOut + "' ";
+           }
+           else {
+           conditions += " CheckOut = '" + checkOut + "' ";
+         }
+        }
+        if(roomCode.length() != 0){
+           if (where == 0){
+              conditions += " WHERE ";
+              where++;
+           } else{
+              conditions += " AND ";
+           }
+           if (roomCode.indexOf('%') >= 0){
+             conditions += " Room LIKE '" + roomCode + "' ";
+           }
+           else {
+             conditions += " Room = '" + roomCode + "' ";
+           }
+        }
+        if(reservationCode.length() != 0 ){
+           if (where == 0){
+              conditions += " WHERE ";
+              where++;
+           } else{
+              conditions += " AND ";
+           }
+           if (reservationCode.indexOf('%') >= 0){
+             conditions += " CODE LIKE " + reservationCode + " ";
+           }
+           else {
+             conditions += " CODE = " + reservationCode + " ";
+          }
+        }
+        conditions += ";";
+
+        String sql = " SELECT * FROM lab7_reservations ";
+
+        sql = sql + conditions;
+
+        System.out.println("The sql query is: " + sql + "\n\n");
+
+        try (Statement stmt = conn.createStatement()) {
+           // Step 4: Send SQL statement to DBMS
+           ResultSet rs = stmt.executeQuery(sql);
+           // Step 5: Handle results
+           System.out.format("CODE\t\tRoom\t\tCheckIn\t\tCheckout\t\tRate\t\tLastName\t\tFirstName\t\tAdults\t\tKids\n");
+           while(rs.next()) {
+             String code1 = rs.getString("CODE");
+             String room1 = rs.getString("Room");
+             String checkIn1 = rs.getString("CheckIn");
+             String checkOut1 = rs.getString("Checkout");
+             String rate1 = rs.getString("Rate");
+             String lastName1 = rs.getString("LastName");
+             String firstName1 = rs.getString("FirstName");
+             String adults1 = rs.getString("Adults");
+             String kids1 = rs.getString("Kids");
+
+             System.out.format("%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\n", code1, room1, checkIn1, checkOut1, rate1, lastName1, firstName1, adults1, kids1);
+          }
+        }
+     }
+  }
 
   // ***************************************************************************
   // Requrirement #6
