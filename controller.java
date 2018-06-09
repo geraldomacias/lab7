@@ -17,19 +17,48 @@ import java.text.SimpleDateFormat;
 
 public class controller {
   public static void main(String[] args) {
-    try {
-      controller c = new controller();
-      // Make an interactive menu for slecting which option to run
+    controller c = new controller();
+    Scanner keyboard = new Scanner(System.in);
+    int input = 0;
 
-      //c.demo1();
-      //c.demo2();
-      //c.demo3();
-      //c.demo4();
-      c.demo5();
-      //c.demo6();
-    } catch (SQLException e) {
-  	    System.err.println("SQLException: " + e.getMessage());
-    }
+    // Make an interactive menu for slecting which option to run
+    System.out.println("********* Welcome to Geraldo's and Luis' lab7 from " +
+                      " csc365spring2018 *********");
+    do {
+      System.out.println("Please select one of the following menu options.");
+      System.out.println("[1] Rooms and Rates");
+      System.out.println("[2] Reservations");
+      System.out.println("[3] Reservation Change");
+      System.out.println("[4] Reservation Cancellation");
+      System.out.println("[5] Detailed Reservation Information");
+      System.out.println("[6] Revenue");
+      System.out.println("[0] to exit");
+      input = keyboard.nextInt();
+      try {
+        if (input == 1) {
+          c.demo1();
+        } else if (input == 2) {
+          c.demo2();
+        } else if  (input == 3) {
+          c.demo3();
+        } else if (input == 4) {
+          c.demo4();
+        } else if (input == 5) {
+          c.demo5();
+        } else if (input == 6) {
+          c.demo6();
+        } else if (input == 0) {
+          System.out.println("Terminating program");
+          return;
+        } else {
+          System.out.println("Invalid menu option.");
+          System.out.println("Please try again.");
+          input = -1;
+        }
+      } catch (SQLException e) {
+         System.err.println("SQLException: " + e.getMessage());
+      }
+    } while (input > 0);
   }
   // ***************************************************************************
   // Requrirement #1
