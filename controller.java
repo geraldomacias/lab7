@@ -100,7 +100,7 @@ public class controller {
          "AND CURRENT_DATE BETWEEN a.CheckIn AND a.Checkout " +
          "GROUP BY a.Room)) AS partb " +
         "ON a.Room = partb.Room " +
-        "JOIN " +
+        "RIGHT OUTER JOIN " +
          "(SELECT a.Room, DATEDIFF(Checkout, CheckIn) AS recent_stay_day_count, Checkout " +
          "FROM lab7_reservations AS a " +
          "JOIN " +
